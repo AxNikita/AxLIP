@@ -23,11 +23,12 @@ async def cmd_ping(message: types.Message):
 
 @dp.message(lambda message: re.fullmatch(r'^\d+$', message.text))
 async def cmd_number(message: types.Message):
+    textFromMessage = int(message.text)
     try:
-        num = int(message.text)
+        num = textFromMessage
         await message.answer(message.from_user.username + " SEND: " + str(num))
-    except Exception:
-        logging.error("ERROR")
+    except (ValueError, TypeError):
+        logging.error("ERRRROOOR")
 
 
 async def main():
