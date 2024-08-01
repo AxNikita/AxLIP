@@ -7,6 +7,7 @@ from aiogram.filters.command import Command
 from aiogram.filters.command import CommandStart
 
 import config
+import sender_service
 
 dp = Dispatcher()
 
@@ -22,11 +23,11 @@ async def cmd_ping(message: types.Message):
 
 
 @dp.message(lambda message: re.fullmatch(r'^\d+$', message.text))
-async def cmd_number(message: types.Message):
-    textFromMessage = int(message.text)
+async def cmd_page(message: types.Message):
     try:
-        num = textFromMessage
-        await message.answer(message.from_user.username + " SEND: " + str(num))
+        page = int(message.text)
+        sender_service.send_page(page)
+        await message.answer(message.from_user.username + " мы сохранили вашу страницу!")
     except (ValueError, TypeError):
         logging.error("ERRRROOOR")
 
