@@ -3,32 +3,39 @@ import logging
 import re
 
 from aiogram import Bot, Dispatcher, types
-from aiogram.filters.command import Command
 from aiogram.filters.command import CommandStart
 
 import config
+import logging_config
+import sender_service
 
 dp = Dispatcher()
+logging_config.setup_logging()
+logging = logging.getLogger("app")
+
+
+def get_username(message):
+    return message.from_user.username
 
 
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message):
-    await message.answer("Hello!")
-
-
-@dp.message(Command("ping"))
-async def cmd_ping(message: types.Message):
-    await message.answer("pong")
+    username = get_username(message)
+    logging.info("start command = " + username)
+    await message.answer("Hello " + username + " !")
 
 
 @dp.message(lambda message: re.fullmatch(r'^\d+$', message.text))
-async def cmd_number(message: types.Message):
-    textFromMessage = int(message.text)
+async def cmd_page(message: types.Message):
+    username = get_username(message)
     try:
-        num = textFromMessage
-        await message.answer(message.from_user.username + " SEND: " + str(num))
+        page = int(message.text)
+        logging.info("page = " + str(page))
+        sender_service.send_page(page)
+        await message.answer(username + " мы сохранили вашу страницу!")
     except (ValueError, TypeError):
-        logging.error("ERRRROOOR")
+        logging.error("Ошибка конвертации текста в цифру = " + username)
+        await message.answer(username + " мы не смогли сохранить вашу страницу, возникла ошибка!")
 
 
 async def main():
@@ -37,5 +44,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     asyncio.run(main())
