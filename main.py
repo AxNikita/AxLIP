@@ -7,8 +7,8 @@ from aiogram.filters.command import CommandStart
 from aiogram.types import KeyboardButton
 
 import config
+import gateway_service
 import logging_config
-import sender_service
 
 dp = Dispatcher()
 logging_config.setup_logging()
@@ -39,7 +39,13 @@ async def cmd_start(message: types.Message):
 
 @dp.message(F.text.lower() == "📖")
 async def cmd_get_page(message: types.Message):
-    await message.answer("Ваша ссылка на книгу: ")
+    username = get_username(message)
+    page_link = gateway_service.get_page_link()
+    if page_link != gateway_service.Status.ERROR:
+        html_message = f'<a href="{page_link}">Ссылка</a>'
+        await message.answer("✅ " + username + " Ваша ссылка на траницу в книге:\n\n" + html_message, parse_mode='HTML')
+    else:
+        await message.answer("❌ " + username + " мы не смогли получить ссылку на книгу, возникла ошибка!")
 
 
 @dp.message(F.text.lower() == "📚")
@@ -50,14 +56,13 @@ async def cmd_get_books(message: types.Message):
 @dp.message(lambda message: re.fullmatch(r'^\d+$', message.text))
 async def cmd_save_page(message: types.Message):
     username = get_username(message)
-    try:
-        page = int(message.text)
-        logging.info("page = " + str(page))
-        sender_service.send_page(page)
-        await message.answer(username + " мы сохранили вашу страницу!")
-    except (ValueError, TypeError):
-        logging.error("Ошибка конвертации текста в цифру = " + username)
-        await message.answer(username + " мы не смогли сохранить вашу страницу, возникла ошибка!")
+    page = int(message.text)
+    logging.info("page = " + str(page))
+    status = gateway_service.save_page(page)
+    if status == gateway_service.Status.OK:
+        await message.answer("✅ " + username + " мы сохранили вашу страницу!")
+    else:
+        await message.answer("❌ " + username + " мы не смогли сохранить вашу страницу, возникла ошибка!")
 
 
 async def main():
