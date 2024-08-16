@@ -2,8 +2,9 @@ import asyncio
 import logging
 import re
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import CommandStart
+from aiogram.types import KeyboardButton
 
 import config
 import logging_config
@@ -22,11 +23,32 @@ def get_username(message):
 async def cmd_start(message: types.Message):
     username = get_username(message)
     logging.info("start command = " + username)
-    await message.answer("Hello " + username + " !")
+    kb = [
+        [
+            KeyboardButton(text="📖"),
+            KeyboardButton(text="📚")
+        ]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True,
+        input_field_placeholder="Введите вашу страницу"
+    )
+    await message.answer("Привет " + username + " !", reply_markup=keyboard)
+
+
+@dp.message(F.text.lower() == "📖")
+async def cmd_get_page(message: types.Message):
+    await message.answer("Ваша ссылка на книгу: ")
+
+
+@dp.message(F.text.lower() == "📚")
+async def cmd_get_books(message: types.Message):
+    await message.answer("Ваши книги: ")
 
 
 @dp.message(lambda message: re.fullmatch(r'^\d+$', message.text))
-async def cmd_page(message: types.Message):
+async def cmd_save_page(message: types.Message):
     username = get_username(message)
     try:
         page = int(message.text)
