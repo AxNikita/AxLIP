@@ -39,30 +39,32 @@ async def cmd_start(message: types.Message):
 
 @dp.message(F.text.lower() == "📖")
 async def cmd_get_page(message: types.Message):
-    username = get_username(message)
     page_link = gateway_service.get_page_link()
     if page_link != gateway_service.Status.ERROR:
         html_message = f'<a href="{page_link}">Ссылка</a>'
-        await message.answer("✅ " + username + " Ваша ссылка на траницу в книге:\n\n" + html_message, parse_mode='HTML')
+        await message.answer("✅ " + " Ваша ссылка на траницу в книге:\n\n" + html_message, parse_mode='HTML')
     else:
-        await message.answer("❌ " + username + " мы не смогли получить ссылку на книгу, возникла ошибка!")
+        await message.answer("❌ " + " Не смогли получить ссылку на книгу, возникла ошибка!")
 
 
 @dp.message(F.text.lower() == "📚")
 async def cmd_get_books(message: types.Message):
-    await message.answer("Ваши книги: ")
+    all_books = gateway_service.get_all_books()
+    if all_books != gateway_service.Status.ERROR:
+        await message.answer("✅ " + " Ваши книги:\n\n" + all_books)
+    else:
+        await message.answer("❌ " + " Не смогли получить книги из вашей библиотеки, возникла ошибка!")
 
 
 @dp.message(lambda message: re.fullmatch(r'^\d+$', message.text))
 async def cmd_save_page(message: types.Message):
-    username = get_username(message)
     page = int(message.text)
     logging.info("page = " + str(page))
     status = gateway_service.save_page(page)
     if status == gateway_service.Status.OK:
-        await message.answer("✅ " + username + " мы сохранили вашу страницу!")
+        await message.answer("✅ " + " Страница сохранена!")
     else:
-        await message.answer("❌ " + username + " мы не смогли сохранить вашу страницу, возникла ошибка!")
+        await message.answer("❌ " + " Не смогли сохранить вашу страницу, возникла ошибка!")
 
 
 async def main():
