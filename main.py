@@ -22,7 +22,7 @@ def get_username(message):
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message):
     username = get_username(message)
-    logging.info("start command = " + username)
+    logging.info("start command for = " + username)
     kb = [
         [
             KeyboardButton(text="📖"),
@@ -34,15 +34,25 @@ async def cmd_start(message: types.Message):
         resize_keyboard=True,
         input_field_placeholder="Введите вашу страницу"
     )
-    await message.answer("Привет " + username + " !", reply_markup=keyboard)
+    greeting = ("Привет " + username + " !\n\n"
+                + "В этом боте только ты управляешь прогресом чтения своих книг.\n\n"
+                + "Введи просто цифры страницы на которой остановился и я сохраню ее для тебя.")
+    await message.answer(greeting, reply_markup=keyboard)
 
 
 @dp.message(F.text.lower() == "📖")
 async def cmd_get_page(message: types.Message):
-    page_link = gateway_service.get_page_link()
-    if page_link != gateway_service.Status.ERROR:
+    book = gateway_service.get_current_book()
+    if book != gateway_service.Status.ERROR:
+        book_name = book.get('book_name')
+        book_page = book.get('book_page')
+        book_img_link = book.get('book_img_link')
+        page_link = config.GATEWAY_URL + book.get('page_link')
         html_message = f'<a href="{page_link}">Ссылка</a>'
-        await message.answer("✅ " + " Ваша ссылка на траницу в книге:\n\n" + html_message, parse_mode='HTML')
+        answer = ("✅ " + " Книга: " + book_name + "\n\n"
+                  + "Страница: " + str(book_page) + "\n\n"
+                  + html_message)
+        await message.answer(answer, parse_mode='HTML')
     else:
         await message.answer("❌ " + " Не смогли получить ссылку на книгу, возникла ошибка!")
 
