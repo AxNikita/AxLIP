@@ -41,7 +41,7 @@ async def cmd_start(message: types.Message):
 
 
 @dp.message(F.text.lower() == "📖")
-async def cmd_get_page(message: types.Message):
+async def cmd_current_book(message: types.Message):
     book = gateway_service.get_current_book()
     if book != gateway_service.Status.ERROR:
         book_name = book.get('book_name')
@@ -58,10 +58,15 @@ async def cmd_get_page(message: types.Message):
 
 
 @dp.message(F.text.lower() == "📚")
-async def cmd_get_books(message: types.Message):
+async def cmd_get_all_books(message: types.Message):
     all_books = gateway_service.get_all_books()
     if all_books != gateway_service.Status.ERROR:
-        await message.answer("✅ " + " Ваши книги:\n\n" + all_books)
+        answer = "✅ " + " Ваши книги:\n\n"
+
+        for book in all_books:
+            answer += book.get('book_name') + " : " + str(book.get('book_page')) + "\n"
+
+        await message.answer(answer)
     else:
         await message.answer("❌ " + " Не смогли получить книги из вашей библиотеки, возникла ошибка!")
 
