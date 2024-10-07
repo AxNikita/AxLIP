@@ -6,8 +6,8 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import CommandStart
 from aiogram.types import KeyboardButton
 
+import book_service
 import config
-import gateway_service
 import logging_config
 
 dp = Dispatcher()
@@ -42,8 +42,8 @@ async def cmd_start(message: types.Message):
 
 @dp.message(F.text.lower() == "📖")
 async def cmd_current_book(message: types.Message):
-    book = gateway_service.get_current_book()
-    if book != gateway_service.Status.ERROR:
+    book = book_service.get_current_book()
+    if book != book_service.Status.ERROR:
         book_name = book.get('book_name')
         book_page = book.get('book_page')
         book_img_link = book.get('book_img_link')
@@ -59,8 +59,8 @@ async def cmd_current_book(message: types.Message):
 
 @dp.message(F.text.lower() == "📚")
 async def cmd_get_all_books(message: types.Message):
-    all_books = gateway_service.get_all_books()
-    if all_books != gateway_service.Status.ERROR:
+    all_books = book_service.get_all_books()
+    if all_books != book_service.Status.ERROR:
         answer = "✅ " + " Ваши книги:\n\n"
 
         for book in all_books:
@@ -75,8 +75,8 @@ async def cmd_get_all_books(message: types.Message):
 async def cmd_save_page(message: types.Message):
     page = int(message.text)
     logging.info("page = " + str(page))
-    status = gateway_service.save_page(page)
-    if status == gateway_service.Status.OK:
+    status = book_service.save_page(page)
+    if status == book_service.Status.OK:
         await message.answer("✅ " + " Страница сохранена!")
     else:
         await message.answer("❌ " + " Не смогли сохранить вашу страницу, возникла ошибка!")
