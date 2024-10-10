@@ -11,8 +11,8 @@ services:
     ports:
       - "5432:5432"
 
-  axlip:
-    container_name: axlip
+  app:
+    container_name: app
     build:
       context: .
       dockerfile: Dockerfile
