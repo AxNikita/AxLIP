@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+
   database:
     container_name: postgres
     image: postgres:17.0-alpine3.20
@@ -9,6 +10,14 @@ services:
       POSTGRES_PASSWORD: admin
     ports:
       - "5432:5432"
+
+  axlip:
+    container_name: axlip
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - TG_TOKEN=${TG_TOKEN}
 
 #  pgadmin:
 #    container_name: pgadmin

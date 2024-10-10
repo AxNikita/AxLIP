@@ -9,7 +9,7 @@ def answer_response_for_current_book_cmd(book):
     book_img_link = book.get('book_img_link')
     answer = ("✅  Книга: " + book.get('book_name') + "\n\n"
               + "Страница: " + str(book.get('book_page')) + "\n\n"
-              + f'<a href="{book.get('page_link')}">Ссылка</a>')
+              + f'<a href="{book.get("page_link")}">Ссылка</a>')
     return answer
 
 
