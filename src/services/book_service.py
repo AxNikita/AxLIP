@@ -1,14 +1,14 @@
 class BookService:
 
-    def __init__(self, log, postgres_template):
+    def __init__(self, log, book_repository):
         self.log = log
-        self.postgres_template = postgres_template
+        self.book_repository = book_repository
 
     def get_all_books(self):
-        return self.postgres_template.get_all_books()
+        return self.book_repository.get_all_books()
 
     def get_current_book(self):
-        return self.postgres_template.get_current_book()
+        return self.book_repository.get_current_book()
 
     def save_page(self, page):
-        return self.postgres_template.save_page(page)
+        return self.book_repository.save_page(page)

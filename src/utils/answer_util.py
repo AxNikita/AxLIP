@@ -20,7 +20,7 @@ def wrong_answer_response_for_current_book():
 def answer_response_for_all_books_cmd(all_books):
     answer = "✅  Ваши книги:\n\n"
     for book in all_books:
-        answer += book.get('book_name') + " : " + str(book.get('book_page')) + "\n"
+        answer += book.book_name + " : " + str(book.book_page) + "\n"
     return answer
 
 
