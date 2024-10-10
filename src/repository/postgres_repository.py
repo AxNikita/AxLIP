@@ -1,11 +1,7 @@
-import logging
-
 import psycopg2
 from psycopg2 import sql
 
-logging = logging.getLogger("app")
-
-conn_params = {
+connection_params = {
     'dbname': 'postgres',
     'user': 'admin',
     'password': 'admin',
@@ -14,17 +10,17 @@ conn_params = {
 }
 
 
-class DBUtils:
+class PostgresTemplate:
 
-    def __init__(self):
-        self.connection = psycopg2.connect(**conn_params)
+    def __init__(self, log):
+        self.log = log
+        self.connection = psycopg2.connect(**connection_params)
         self.cursor = self.connection.cursor()
 
     def get_all_books(self):
         self.cursor.execute("SELECT * FROM books")
-        columns = [desc[0] for desc in self.cursor.description]
-        books = [dict(zip(columns, row)) for row in self.cursor.fetchall()]
-        logging.info(f"All books: {books}")
+        books = self.map_to_list_books()
+        self.log.info(f"All books: {books}")
         return books
 
     def get_current_book(self):
@@ -38,7 +34,7 @@ class DBUtils:
             'book_page': most_priority_book['book_page'],
             'page_link': page_link
         }
-        logging.info(f"Current book: {current_book}")
+        self.log.info(f"Current book: {current_book}")
         return current_book
 
     def save_page(self, page):
@@ -50,8 +46,12 @@ class DBUtils:
         )
         updated_book = dict(zip([desc[0] for desc in self.cursor.description], self.cursor.fetchone()))
         self.connection.commit()
-        logging.info(f"Page is saved! {updated_book}")
+        self.log.info(f"Page is saved! {updated_book}")
         return updated_book
+
+    def map_to_list_books(self):
+        columns = [desc[0] for desc in self.cursor.description]
+        return [dict(zip(columns, row)) for row in self.cursor.fetchall()]
 
     def get_book_directory(self):
         return "http://localhost:8080/"
